@@ -1,0 +1,19 @@
+#Name <- c("Jeb", “Donald”, "Ted”, “Marco” “Carly”, “Hillary”, “Berine”)
+
+#ABC political poll results <- c(4, 62 51, 21, 2, 14, 15)
+
+#CBS political poll results <- c(12, 75, 43, 19, 1, 21, 19)
+
+ 
+
+#The name vector has two problems: there are curly quotes instead of regular quotes on nearly every variable, and there is a missing "," after Marco.
+
+#Both of the political vectors have spaces within the names, which R does not allow. Also, there is a missing comma in the ABC vector, and the vector names could be simplified. 
+
+ 
+
+Name <- c("Jeb", "Donald", "Ted", "Marco", "Carly", "Hillary", "Berine")
+
+ABC_results <- c(4, 62, 51, 21, 2, 14, 15)
+
+CBS_results <- c(12, 75, 43, 19, 1, 21, 19)
