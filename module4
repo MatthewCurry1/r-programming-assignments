@@ -1,0 +1,17 @@
+Frequency <- c(0.6,0.3,0.4,0.4,0.2,0.6,0.3,0.4,0.9,0.2)
+BP <- c(103,87,32,42,59,109,78,205,135,176)
+First <- c(1,1,1,1,0,0,0,0,NA,1)
+Second <- c(0,0,1,1,0,0,1,1,1,1)
+FinalDecision <- c(0,1,0,1,0,1,0,1,1,1)
+
+patients <- data.frame(Frequency, BP, First, Second, FinalDecision)
+
+boxplot(BP ~ FinalDecision, data = patients)
+hist(patients$BP)
+
+ 
+#From the charts we can see a few things. The boxplot shows us that there is a direct correlation between a high emergency unit decision and a higher BP. 
+#In contrary, a low emergency unit decision correlates with a low BP.
+#From the histogram we can see that the highest frequency in BP is between 50-150. 
+
+
