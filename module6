@@ -1,0 +1,18 @@
+mtc <- mtcars
+
+hist(mtc$wt, main = "MtCars Weight", xlab = "Weight", col = "gray")
+
+# My code simply put the already created object "mtcars" in a new data frame called "mtc". 
+# From there I created a histogram with of the mtcars weight column, with the function hist(). 
+# I also created labels with the x-axis and title, and since the y-axis was naturally the wanted "Frequency", I left that.
+
+ 
+#This fits into Yau's and Few's discussion on basic visualization because this simple histogram highlights the distribution in weight between the cars.
+
+ 
+
+ 
+
+ 
+
+
