@@ -1,0 +1,22 @@
+patients <- data.frame(
+  names = c("John", "Greg", "Amanda", "Zoey"),
+  age = c(45,32,24,36),
+  health = factor(c("poor", "fair", "good", "poor"))
+)
+
+head(patients)
+tails(patients)
+
+
+otype(patients) #returns S3
+
+setClass("patients",
+         representation(names = "character", age = "numeric", health = "factor")
+         )           
+patients <- new("patients",
+              names = c("John", "Greg", "Amanda", "Zoey"),
+              age = c(45,32,24,36),
+              health = factor(c("poor", "fair", "good", "poor"))
+          )
+
+
