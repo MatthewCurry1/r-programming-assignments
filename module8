@@ -1,0 +1,22 @@
+#1
+library(plyr)
+
+student <- read.table("Assignment 6 Dataset.txt", header = TRUE, sep = ",")
+
+studentAverage = ddply(student,"Sex",transform,Grade.Average=mean(Grade))
+
+grades = student$Grade
+mean(grades)
+
+
+#2
+newx = subset(Student,grepl("[iI]",student$Name))
+
+subset(newx, grepl("i", newx$Name))
+
+
+#3
+write.table(newx,"DataSubset",sep=",")
+
+
+#After all this you're left with a .txt file that contains only the names of students with the letter "i" in it.
