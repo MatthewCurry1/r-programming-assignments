@@ -1,0 +1,25 @@
+---
+title: "My R Markdown Primer"
+author: "Matthew Curry"
+date: "2026-04-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2 Populate the Document
+
+R Markdown is an area to write text, run R scripts, and post outputs all on one sheet.
+
+$$ 2 + 2 = 4 $$
+
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+ggplot(mtcars, aes(wt, mpg)) + geom_line()
+```
