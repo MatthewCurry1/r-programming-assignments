@@ -1,0 +1,116 @@
+library(dplyr)
+
+flightdata <- read.csv("flights.csv")
+flightdata <- flightdata[flightdata$MONTH == 2 & flightdata$YEAR == 2015 & 
+                           flightdata$DAY >= 16 & flightdata$DAY <= 24, ]
+
+keep_airlines <- c("AA", "DL", "WN", "UA", "US", "VX")
+flightdata <- flightdata[flightdata$AIRLINE %in% keep_airlines, ]
+
+airline_names <- c(AA="American", DL="Delta", WN="Southwest", 
+                   UA="United", US="US Airways", VX="Virgin America")
+flightdata$AIRLINE_NAME <- airline_names[flightdata$AIRLINE]
+flightdata <- flightdata %>%
+  select(-AIRLINE)
+
+write.csv(flightdata, "flightdata_cleaned.csv", row.names = FALSE)
+
+
+tweets <- read.csv("Tweets-1.csv")
+
+tweets <- tweets %>%
+  select(-tweet_coord, -name,
+         -tweet_id, -airline_sentiment_gold, -negativereason_gold)
+
+tweets <- tweets[!duplicated(tweets$text), ]
+tweets <- tweets[tweets$airline_sentiment_confidence >= 0.5, ]
+
+write.csv(tweets, "tweets_cleaned.csv", row.names = FALSE)
+
+############
+
+#read
+tweets_new <- read.csv("tweets_cleaned.csv")
+flights_new <- read.csv("flightdata_cleaned.csv")
+
+#Vector, VSource
+tweets_source <- VectorSource(tweets_new$text)
+tweets_corpus <- VCorpus(tweets_source)
+
+#Clean
+tweets_corpus <- tm_map(tweets_corpus, removeNumbers)
+tweets_corpus <- tm_map(tweets_corpus, removePunctuation)
+tweets_corpus <- tm_map(tweets_corpus, content_transformer(tolower))
+tweets_corpus <- tm_map(tweets_corpus, removeWords, stopwords("en"))
+tweets_corpus <- tm_map(tweets_corpus, stripWhitespace)
+
+#Tdm, Matrix
+tweets_tdm <- DocumentTermMatrix(tweets_corpus)
+tweets_m <- as.matrix(tweets_tdm)
+
+#Count
+wordCounts <- colSums(tweets_m)
+wordCounts <- sort(wordCounts, decreasing=TRUE)
+
+#Positive and Negative Words, clean https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html
+pos <- "positive-words.txt"
+neg <- "negative-words.txt"
+p <- scan(pos, character(0),sep = "\n")
+n <- scan(neg, character(0),sep = "\n")
+p <- p[-1:-29]
+n <- n[-1:-30]
+
+#Sum of total words
+totalWords <- sum(wordCounts)
+#Word names
+words<- names(wordCounts)
+
+#Match to positive
+matched <- match(words, p, nomatch = 0)
+
+#Keep positives only
+mCounts <- wordCounts[which(matched != 0)]
+length(mCounts)
+mWords <- names(mCounts)
+nPos <- sum(mCounts)
+nPos
+
+#Keep negatives only
+matched <- match(words, n, nomatch = 0)
+nCounts <- wordCounts[which(matched != 0)]
+nNeg <- sum(nCounts)
+nWords <- names(nCounts)
+nNeg
+length(nCounts)
+
+#Positive and negative per tweet
+positive_count <- rowSums(tweets_m[, colnames(tweets_m) %in% p])
+negative_count <- rowSums(tweets_m[, colnames(tweets_m) %in% n])
+
+#Difference between the two per tweet
+tweets_new$opinion <- positive_count - negative_count
+
+#New table see with View(airline_opinion)
+#Analyzes the tweets into the new table
+airline_opinion <- tweets_new %>%
+  group_by(airline) %>%
+  summarise(
+    average_opinion = mean(opinion, na.rm = TRUE),
+    confidence = mean(airline_sentiment_confidence),
+    positive_percent = mean(airline_sentiment == "positive"),
+    neutral_percent = mean(airline_sentiment == "neutral"),
+    negative_percent = mean(airline_sentiment == "negative")
+  )
+
+#New table see with View(combined_analysis)
+#Compare two tables into new table
+combined_analysis <- airline_opinion %>%
+  inner_join(
+    flights_new %>%
+      group_by(AIRLINE_NAME) %>%
+      summarise(
+        average_delay = mean(ARRIVAL_DELAY, na.rm = TRUE),
+        cancel_percent = (mean(CANCELLED, na.rm = TRUE) * 100)
+      ),
+    by = c("airline" = "AIRLINE_NAME")
+  )
